@@ -4,4 +4,4 @@ A state monadic fragment that captures Heim's (1983) dynamic semantics for presu
 
 I both define the Heimian dynamic connectives directly, and define "natural" lifter functions which take static propositional operators to their Heimian counterparts. We show that our lifter functions fail to deliver the same result as Heim for disjunction.
 
-In order to salvage an account based on lifting static propositional operators, we posit an exhaustivity operator, which updates the common ground with the implicatures of its prejacent first. 
+In order to salvage an account based on lifting static propositional operators, I posit an exhaustivity operator, which updates the common ground with the implicatures of its prejacent first. 
