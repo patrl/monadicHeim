@@ -192,6 +192,24 @@ dynLift2 op m n = StateT
           _ -> Nothing
   )
 
+-- We can rescue our deviant prediction for disjunction by invoking an exhaustivity operator.
+-- To simplify, we assume that a proposition is exhaustified relative to a single alternative.
+
+exh :: Set S -> U (Set S) -> U (Set S)
+exh alt m = StateT (\c ->
+                      let c' = c ∖ (c ∩ alt)
+                          in let oVal = evalStateT m c'
+                                 oState = execStateT m c'
+                             in case (oVal,oState) of
+                                  (Just p, Just c'') -> Just (p,c'')
+                                  _ -> Nothing
+                   )
+
+-- "Either Paul didn't smoke or (EXH) Paul stopped smoking"
+
+-- >>> updIgnorance $ (dynLift2 propDisj) ((dynLift propNeg) $ assertLift $ _didSmoke Paul) (exh (propNeg worlds $ _didSmoke Paul) (_stoppedSmoking Paul))
+-- Just (fromList [W2,W3,W4],fromList [W2,W4])
+
 ---
 -- Facts demonstrated in the examples below:
 --
