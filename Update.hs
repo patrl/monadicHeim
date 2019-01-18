@@ -75,6 +75,10 @@ type U = StateT (Set S) Maybe
 _stoppedSmoking :: E -> U (Set S)
 _stoppedSmoking = toPresuppPred _didSmoke (propNeg worlds <$> _smokesNow)
 
+-- _stoppedSmoking' :: E -> S -> Maybe T
+-- _stoppedSmoking' x w = if w Set.member _didSmoke x then undefined else undefined
+
+
 -- a helper function from a presupposition and an assertion to the corresponding presuppositional predicate.
 toPresuppPred :: (E -> Set S) -> (E -> Set S) -> E -> U (Set S)
 toPresuppPred presupp assertion x = StateT
@@ -196,14 +200,15 @@ dynLift2 op m n = StateT
 -- To simplify, we assume that a proposition is exhaustified relative to a single alternative.
 
 exh :: Set S -> U (Set S) -> U (Set S)
-exh alt m = StateT (\c ->
-                      let c' = c ∖ (c ∩ alt)
-                          in let oVal = evalStateT m c'
-                                 oState = execStateT m c'
-                             in case (oVal,oState) of
-                                  (Just p, Just c'') -> Just (p,c'')
-                                  _ -> Nothing
-                   )
+exh alt m = StateT
+  (\c ->
+    let c' = c ∖ (c ∩ alt)
+    in  let oVal   = evalStateT m c'
+            oState = execStateT m c'
+        in  case (oVal, oState) of
+              (Just p, Just c'') -> Just (p, c'')
+              _                  -> Nothing
+  )
 
 -- "Either Paul didn't smoke or (EXH) Paul stopped smoking"
 
