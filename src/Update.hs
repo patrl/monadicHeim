@@ -2,11 +2,12 @@
 
 module Update where
 
+import Model
 import           Control.Monad.State
 import           Data.Set                       ( Set )
 import qualified Data.Set                      as Set
 
--- unicode set theory symbols for readability
+-- Unicode set theory symbols for readability
 
 (∩) :: Ord a => Set a -> Set a -> Set a
 (∩) = Set.intersection
@@ -19,34 +20,6 @@ import qualified Data.Set                      as Set
 
 (⊆) :: Ord a => Set a -> Set a -> Bool
 (⊆) = Set.isSubsetOf
-
--- The type of truth values.
-type T = Bool
-
--- The type of individuals.
-data E = Hubert | Paul deriving (Eq, Show, Bounded, Enum)
-
--- The type of possible worlds.
-data S = W1 | W2 | W3 | W4 deriving (Eq, Show, Bounded, Enum, Ord)
-
-worlds :: Set S
-worlds = [W1 .. W4]
-
--- One-place assertive predicates
-_smokesNow :: E -> Set S
-_smokesNow = \case
-  Paul   -> [W1, W2]
-  Hubert -> [W1, W3]
-
-_didSmoke :: E -> Set S
-_didSmoke = \case
-  Paul   -> [W1, W3]
-  Hubert -> [W1, W2]
-
-_vapes :: E -> Set S
-_vapes = \case
-  Paul   -> [W1, W2]
-  Hubert -> [W3, W4]
 
 -- Some basic propositional operators. Note that I've supplied them with an additional parameter -- a contextual domain of worlds.
 -- The reason for this will become clear later on.
@@ -71,14 +44,6 @@ type U = StateT (Set S) Maybe
 -- N.b. that without the boilerplate, this is:
 -- U a = Set S -> Maybe (a, Set S)
 
--- A presuppositional predicate
-_stoppedSmoking :: E -> U (Set S)
-_stoppedSmoking = toPresuppPred _didSmoke (propNeg worlds <$> _smokesNow)
-
--- _stoppedSmoking' :: E -> S -> Maybe T
--- _stoppedSmoking' x w = if w Set.member _didSmoke x then undefined else undefined
-
-
 -- a helper function from a presupposition and an assertion to the corresponding presuppositional predicate.
 toPresuppPred :: (E -> Set S) -> (E -> Set S) -> E -> U (Set S)
 toPresuppPred presupp assertion x = StateT
@@ -86,6 +51,10 @@ toPresuppPred presupp assertion x = StateT
     then Just (assertion x, c ∩ assertion x)
     else Nothing
   )
+
+-- A presuppositional predicate
+_stoppedSmoking :: E -> U (Set S)
+_stoppedSmoking = toPresuppPred _didSmoke (propNeg worlds <$> _smokesNow)
 
 -- update the common ground.
 assert :: U (Set S) -> U (Set S)
@@ -102,9 +71,9 @@ assert m = StateT
 assertLift :: Set S -> U (Set S)
 assertLift = assert . return
 
--- a helper function to update an ignorance context
-updIgnorance :: U (Set S) -> Maybe (Set S, Set S)
-updIgnorance = ($ worlds) . runStateT
+-- a helper function to update a context
+updContext :: Set S ->  U (Set S) -> Maybe (Set S, Set S)
+updContext c u =  runStateT u $ c
 
 ---
 -- Heimian connectives.
