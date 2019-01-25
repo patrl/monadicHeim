@@ -1,8 +1,8 @@
-{-# LANGUAGE OverloadedLists, LambdaCase #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Update where
 
-import Model
+import           Model
 import           Control.Monad.State
 import           Data.Set                       ( Set )
 import qualified Data.Set                      as Set
@@ -72,8 +72,8 @@ assertLift :: Set S -> U (Set S)
 assertLift = assert . return
 
 -- a helper function to update a context
-updContext :: Set S ->  U (Set S) -> Maybe (Set S, Set S)
-updContext c u =  runStateT u $ c
+updContext :: Set S -> U (Set S) -> Maybe (Set S, Set S)
+updContext c u = runStateT u c
 
 ---
 -- Heimian connectives.
@@ -178,6 +178,7 @@ exh alt m = StateT
               (Just p, Just c'') -> Just (p, c'')
               _                  -> Nothing
   )
+
 
 -- "Either Paul didn't smoke or (EXH) Paul stopped smoking"
 

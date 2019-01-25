@@ -1,6 +1,6 @@
 * Monadic Heim
 
-A state monadic fragment that captures Heim's (1983) dynamic semantics for presupposition projection, by treating sentence meanings as (partial) updates of the common ground.
+A state-monadic fragment that captures Heim's (1983) dynamic semantics for presupposition projection, by treating sentence meanings as (partial) updates of the common ground.
 
 I both define the Heimian dynamic connectives directly, and define "natural" lifter functions which take static propositional operators to their Heimian counterparts. We show that our lifter functions fail to deliver the same result as Heim for disjunction.
 
